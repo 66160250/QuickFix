@@ -84,17 +84,22 @@ exports.updateStatus = async (req, res) => {
 // 4. บันทึกการชำระเงิน
 exports.processPayment = async (req, res) => {
     try {
-        const { booking_id, total_price, expense } = req.body;
-        const priceNum = parseFloat(total_price) || 0;
-        const expenseNum = parseFloat(expense) || 0;
-        const netIncome = priceNum - expenseNum;
+        const { bookingId, total_price, expense, net_income } = req.body;
 
-        await db.query(
-            'UPDATE bookings SET total_price = ?, expense = ?, net_income = ?, payment_status = "paid" WHERE id = ?',
-            [priceNum, expenseNum, netIncome, booking_id]
-        );
+        // ใช้เครื่องหมาย ? แทนการใส่ค่าลงไปใน String โดยตรง
+        const sql = `
+            UPDATE bookings 
+            SET 
+                total_price = ?, 
+                expense = ?, 
+                net_income = ?, 
+                payment_status = 'paid'  -- ใช้ Single Quote รอบคำว่า 'paid' แบบนี้
+            WHERE id = ?
+        `;
 
-        res.redirect('/admin/dashboard');
+        await db.query(sql, [total_price, expense, net_income, bookingId]);
+
+        res.redirect('/admin/dashboard'); // หรือ Redirect ไปหน้าที่ต้องการ
     } catch (err) {
         console.error('❌ Process Payment Error:', err);
         res.status(500).send('เกิดข้อผิดพลาดในการบันทึกชำระเงิน');
