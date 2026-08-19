@@ -20,9 +20,9 @@ exports.getDashboard = async (req, res) => {
         const staffId = currentUser.id || 0;
         const staffName = currentUser.full_name || currentUser.username || '';
 
-        const [myBookings] = await db.query(
-            'SELECT * FROM bookings WHERE assigned_staff_id = ? OR (assigned_staff_name = ? AND assigned_staff_name != "") ORDER BY id DESC',
-            [staffId, staffName]
+        const [bookings] = await db.query(
+            'SELECT * FROM bookings WHERE assigned_staff_id = ? OR (assigned_staff_name = ? AND assigned_staff_name != \'\') ORDER BY id DESC',
+            [user.id, user.full_name]
         );
 
         const bookings = (currentTab === 'my') ? myBookings : allBookings;
