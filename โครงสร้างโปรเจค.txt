@@ -1,0 +1,34 @@
+quickfix/
+├── config/
+│   └── db.js            # ไฟล์เชื่อมต่อ MySQL
+├── controllers/         # Logic การทำงาน (เช่น Auth, Booking, Status)
+│   ├── authController.js
+│   ├── bookingController.js
+│   └── adminController.js
+├── routes/              # เส้นทาง URL (Endpoints)
+│   ├── indexRoutes.js
+│   ├── employeeRoutes.js
+│   └── adminRoutes.js
+├── public/              # ไฟล์ static หน้าบ้าน (ที่อิง Figma 100%)
+│   ├── css/
+│   │   └── style.css    # CSS หลัก (เก็บโทนสี ดำ/ทอง/ครีม จาก Figma)
+│   ├── js/
+│   │   └── main.js     # JavaScript หน้าบ้าน (AJAX / Fetch)
+│   └── images/          # โลโก้ และไอคอนต่างๆ
+├── views/               # หน้า HTML (EJS Template) ตาม Figma
+│   ├── partials/        # Component ใช้ซ้ำ (Navbar, Footer)
+│   │   ├── navbar-user.ejs
+│   │   ├── navbar-staff.ejs
+│   │   └── navbar-admin.ejs
+│   ├── user/            # หน้าฝั่งลูกค้า
+│   │   ├── index.ejs
+│   │   ├── status.ejs
+│   │   └── history.ejs
+│   ├── employee/        # หน้าฝั่งพนักงาน
+│   │   └── dashboard.ejs
+│   └── admin/           # หน้าฝั่ง Admin
+│       ├── login.ejs
+│       └── dashboard.ejs
+├── .env                 # เก็บ Password / Port
+├── app.js               # ไฟล์หลักเปิด Server
+└── package.json         # รายชื่อ Library

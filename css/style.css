@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --bg-main: #f1f7f0;          /* สีพื้นหลัง */
+    --header-bg: #333333;        /* สีเทาเข้ม Header */
+    --accent-yellow: #fbc02d;    /* สีเหลือง QuickFix ปุ่ม/เน้น */
+    --card-bg: #fff1bf;          /* สีครีมส้มอ่อนสำหรับ Card */
+    --card-bg-light: #ffffff;    /* สีขาว */
+    --text-dark: #222222;       /* สีข้อความหลัก */
+    --status-green: #76ff03;     /* สีเขียวสถานะ */
+    --status-orange: #ff9800;    /* สีส้มสถานะ */
+    --status-red: #ff5252;       /* สีแดงยกเลิก/แจ้งเตือน */
+    --status-gray: #d9d9d9;      /* สีเทาเสร็จสิ้น/รอดำเนินการ */
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Kanit', sans-serif;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-dark);
+    min-height: 100vh;
+}
+
+/* --- Header / Navigation Bar --- */
+.navbar {
+    background-color: var(--header-bg);
+    color: white;
+    padding: 15px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand-logo {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent-yellow);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.brand-logo span {
+    color: white;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 25px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    padding-bottom: 4px;
+    transition: 0.2s;
+}
+
+.nav-links a.active, .nav-links a:hover {
+    border-bottom: 3px solid var(--accent-yellow);
+}
+
+/* --- Common Layout & Container --- */
+.container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.page-title {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 25px;
+}
+
+.back-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--text-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: var(--text-dark);
+    font-weight: bold;
+}
+
+/* --- Forms & Buttons --- */
+.btn-yellow {
+    background-color: var(--accent-yellow);
+    color: var(--text-dark);
+    border: none;
+    padding: 10px 25px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-yellow:hover {
+    opacity: 0.9;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}

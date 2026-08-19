@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Fix - Staff Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Prompt', sans-serif !important; box-sizing: border-box; }
+        body { background-color: #e9f0e8; margin: 0; padding: 0; color: #222; }
+
+        .navbar { background-color: #2b2b2b; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .navbar .brand { font-size: 26px; font-weight: 700; color: #fff; text-decoration: none; }
+        .navbar .brand span { color: #f4c430; }
+        .navbar .nav-links { display: flex; align-items: center; gap: 25px; }
+        .navbar .nav-links a { color: #fff; text-decoration: none; font-size: 15px; cursor: pointer; transition: 0.2s; }
+        .navbar .nav-links a:hover { color: #f4c430; }
+        .navbar .btn-logout { color: #ff6b6b !important; font-weight: 500; }
+
+        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+        .main-card { background-color: #fff1c5; border-radius: 20px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+
+        .tab-toggle-container { display: flex; justify-content: center; gap: 20px; margin-bottom: 25px; }
+        .tab-btn { background: #e0e0e0; color: #333; border: 2px solid #333; padding: 8px 30px; border-radius: 25px; font-size: 16px; font-weight: 600; text-decoration: none; display: inline-block; transition: 0.2s; }
+        .tab-btn.active { background: #fff1c5; color: #000; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+
+        .table-responsive { background: transparent; border-radius: 12px; overflow: hidden; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+        th { padding: 12px; text-align: center; font-size: 14px; font-weight: 600; color: #000; border-bottom: 2px solid #333; }
+        td { background: transparent; padding: 12px; text-align: center; font-size: 14px; border-bottom: 1px solid #dcdcd0; vertical-align: middle; }
+        
+        .badge { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
+        .badge-pending { background-color: #fff3c4; color: #856404; }
+        .badge-in-progress { background-color: #d1ecf1; color: #0c5460; }
+        .badge-inspecting { background-color: #e2e3e5; color: #383d41; }
+        .badge-completed { background-color: #d4edda; color: #155724; }
+        .badge-cancelled { background-color: #f8d7da; color: #721c24; }
+
+        .status-form { display: flex; gap: 6px; justify-content: center; align-items: center; }
+        .status-select { padding: 5px 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 12px; }
+        .btn-update { background-color: #17a2b8; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+        .modal-content { background: #fff; padding: 30px; border-radius: 16px; width: 90%; max-width: 600px; position: relative; }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 22px; cursor: pointer; color: #888; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/employee/dashboard" class="brand"><span>Quick</span> Fix</a>
+        <div class="nav-links">
+            <a onclick="openAboutModal()">เกี่ยวกับ</a>
+            <a href="/logout" class="btn-logout">ออกจากระบบ</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- เปลี่ยนปุ่มสลับแท็บให้เป็นลิงก์ดึงข้อมูลจาก Server โดยตรง -->
+        <div class="tab-toggle-container">
+            <a href="/employee/dashboard?tab=all" class="tab-btn <%= currentTab === 'all' ? 'active' : '' %>">รายการทั้งหมด</a>
+            <a href="/employee/dashboard?tab=my" class="tab-btn <%= currentTab === 'my' ? 'active' : '' %>">งานที่รับผิดชอบ</a>
+        </div>
+
+        <div class="main-card">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>รหัสคิว / บริการ</th>
+                            <th>ข้อมูลลูกค้า & รถ</th>
+                            <th>ผู้รับผิดชอบ</th>
+                            <th>สถานะ</th>
+                            <th>อัปเดตสถานะงาน</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (bookings && bookings.length > 0) { %>
+                            <% bookings.forEach(b => { 
+                                const st = (b.status || 'pending').toString().trim().toLowerCase();
+                            %>
+                                <tr>
+                                    <td>
+                                        <strong><%= b.booking_code %></strong><br>
+                                        <small style="color: #555;"><%= b.service_program %></small>
+                                    </td>
+                                    <td>
+                                        <%= b.customer_name %> (<%= b.customer_phone %>)<br>
+                                        <small style="color: #666;"><%= b.car_brand %> <%= b.car_model %> - <%= b.license_plate %></small>
+                                    </td>
+                                    <td>
+                                        <% if (b.assigned_staff_name) { %>
+                                            <span style="font-weight:600; color:#28a745;">👤 <%= b.assigned_staff_name %></span>
+                                        <% } else { %>
+                                            <span style="color:#888;">- ยังไม่มอบหมาย -</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <% if (st === 'pending') { %>
+                                            <span class="badge badge-pending">⏳ รับรถ</span>
+                                        <% } else if (st === 'in-progress') { %>
+                                            <span class="badge badge-in-progress">⚙️ กำลังดำเนินการ</span>
+                                        <% } else if (st === 'inspecting') { %>
+                                            <span class="badge badge-inspecting">🔍 ตรวจสอบ</span>
+                                        <% } else if (st === 'completed') { %>
+                                            <span class="badge badge-completed">✅ เสร็จสิ้น</span>
+                                        <% } else { %>
+                                            <span class="badge badge-cancelled">❌ ยกเลิก</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <form action="/employee/update-status" method="POST" class="status-form">
+                                            <input type="hidden" name="booking_id" value="<%= b.id %>">
+                                            <input type="hidden" name="currentTab" value="<%= currentTab %>">
+                                            <select name="status" class="status-select">
+                                                <option value="pending" <%= st === 'pending' ? 'selected' : '' %>>รับรถ</option>
+                                                <option value="in-progress" <%= st === 'in-progress' ? 'selected' : '' %>>กำลังดำเนินการ</option>
+                                                <option value="inspecting" <%= st === 'inspecting' ? 'selected' : '' %>>ตรวจสอบ</option>
+                                                <option value="completed" <%= st === 'completed' ? 'selected' : '' %>>เสร็จสิ้น</option>
+                                                <option value="cancelled" <%= st === 'cancelled' ? 'selected' : '' %>>ยกเลิก</option>
+                                            </select>
+                                            <button type="submit" class="btn-update">อัปเดต</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr><td colspan="5" style="padding: 30px; color: #888;">ไม่มีรายการคิวงานในส่วนนี้</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal เกี่ยวกับเรา -->
+    <div id="aboutModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeAboutModal()">&times;</span>
+            <h2 style="margin-top:0; color:#222;">🚗 เกี่ยวกับ Quick Fix Car Care</h2>
+            <p style="color:#555; line-height:1.6;">ศูนย์บริการดูแลและทำความสะอาดรถยนต์ครบวงจร</p>
+            <hr style="border:none; border-top:1px solid #eee; margin:15px 0;">
+            <p><strong>🕒 เวลาทำการ:</strong> เปิดบริการทุกวัน 08:00 - 19:00 น.</p>
+            <p><strong>📍 ที่อยู่:</strong> Quick Fix Car Care สาขาใหญ่</p>
+            <p><strong>📞 ติดต่อสอบถาม:</strong> 02-123-4567 | Line: @quickfix</p>
+        </div>
+    </div>
+
+    <script>
+        function openAboutModal() { document.getElementById('aboutModal').style.display = 'flex'; }
+        function closeAboutModal() { document.getElementById('aboutModal').style.display = 'none'; }
+    </script>
+</body>
+</html>

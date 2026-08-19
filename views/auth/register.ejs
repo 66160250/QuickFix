@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Fix - Sign Up</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body { background-color: #2b2b2b; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; font-family: 'Prompt', sans-serif; }
+        .auth-card { background-color: #eef5e8; width: 100%; max-width: 500px; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+        .auth-header { background-color: #2f2f2f; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .auth-header h1 { color: #f4c430; font-family: serif; font-size: 28px; margin: 0; }
+        .auth-header .btn-switch { border: 1px solid #f4c430; color: #ffffff; padding: 6px 18px; border-radius: 20px; text-decoration: none; font-size: 14px; }
+        .auth-body { padding: 30px; text-align: center; }
+        .auth-body h3 { margin-bottom: 20px; font-size: 15px; color: #333; }
+        .form-group { margin-bottom: 12px; text-align: left; }
+        .form-group label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 4px; }
+        .form-control { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .btn-submit { background-color: #f4c430; color: #000; border: none; padding: 10px 40px; border-radius: 20px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>Quick Fix</h1>
+            <a href="/login" class="btn-switch">Sign in</a>
+        </div>
+        <div class="auth-body">
+            <h3>Quick Fix ยินดีให้บริการ<br>มาเป็นสมาชิกครอบครัวเดียวกับเราเถอะ</h3>
+            <% if (error) { %>
+                <p style="color: red; font-size: 14px;"><%= error %></p>
+            <% } %>
+            <form action="/register" method="POST">
+                <div class="form-group">
+                    <label>ชื่อผู้ใช้</label>
+                    <input type="text" name="username" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>อีเมล</label>
+                    <input type="email" name="email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>เบอร์โทรศัพท์</label>
+                    <input type="text" name="phone" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>รหัสผ่าน</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>ยืนยันรหัสผ่าน</label>
+                    <input type="password" name="confirmPassword" class="form-control" required>
+                </div>
+                <button type="submit" class="btn-submit">Sign up</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

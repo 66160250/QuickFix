@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Quick Fix - จัดการคิวและมอบหมายงาน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; font-family: 'Prompt', sans-serif !important; }
+        body { background-color: #e9f0e8; margin: 0; padding: 0; color: #222; }
+
+        .navbar { background-color: #2b2b2b; padding: 0 40px; display: flex; justify-content: space-between; align-items: center; height: 65px; }
+        .navbar .brand { font-size: 26px; font-weight: 700; color: #fff; text-decoration: none; }
+        .navbar .brand span { color: #f4c430; }
+        .navbar .nav-menu { display: flex; height: 100%; align-items: center; gap: 10px; }
+        .navbar .nav-link { color: #fff; text-decoration: none; padding: 0 18px; height: 100%; display: flex; align-items: center; font-size: 15px; font-weight: 500; transition: 0.2s; position: relative; }
+        .navbar .nav-link:hover, .navbar .nav-link.active { color: #f4c430; }
+        .navbar .nav-link.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background-color: #f4c430; border-radius: 4px 4px 0 0; }
+        .navbar .btn-logout { color: #ff6b6b !important; }
+
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .section-title { font-size: 24px; font-weight: 700; margin-bottom: 20px; color: #111; }
+
+        .table-card { background: #fff1c5; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        th { padding: 14px 10px; text-align: center; font-size: 15px; font-weight: 700; color: #000; border-bottom: 2px solid #333; }
+        td { padding: 14px 10px; text-align: center; font-size: 14px; border-bottom: 1px solid #dcdcd0; vertical-align: middle; }
+
+        .select-custom { padding: 6px 8px; border-radius: 20px; border: 1px solid #999; font-size: 13px; background: #fff; outline: none; }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .status-pending { background-color: #e2e8f0; color: #475569; }
+        .status-in-progress { background-color: #dbeafe; color: #1e40af; }
+        .status-inspecting { background-color: #fef3c7; color: #92400e; }
+        .status-completed { background-color: #d1fae5; color: #065f46; }
+        .status-cancelled { background-color: #ffe4e6; color: #9f1239; }
+
+        .btn-update { 
+            background-color: #17a2b8; 
+            color: #ffffff; 
+            border: none; 
+            padding: 6px 16px; 
+            border-radius: 20px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            font-size: 13px; 
+            transition: 0.2s; 
+        }
+        .btn-update:hover { 
+            background-color: #138496; 
+            transform: translateY(-1px);
+        }
+
+        .action-flex {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/admin/dashboard" class="brand"><span>Quick</span> Fix</a>
+        <div class="nav-menu">
+            <a href="/admin/dashboard" class="nav-link">หน้าแรก</a>
+            <a href="/admin/manage" class="nav-link active">จัดการคิว/สถานะ</a>
+            <a href="#" class="nav-link" onclick="alert('กำลังพัฒนา'); return false;">การตั้งค่าบริการ</a>
+            <a href="/logout" class="nav-link btn-logout">ออกจากระบบ</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="section-title">ตารางจัดการคิวและมอบหมายงาน</div>
+
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">คิวที่</th>
+                        <th style="width: 20%;">ข้อมูลลูกค้า</th>
+                        <th style="width: 18%;">บริการ</th>
+                        <th style="width: 18%;">ผู้รับผิดชอบ</th>
+                        <th style="width: 14%;">สถานะ</th>
+                        <th style="width: 20%;">อัปเดตสถานะงาน</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (bookings && bookings.length > 0) { %>
+                        <% bookings.forEach(b => { 
+                            const st = (b.status || 'pending').toString().trim().toLowerCase();
+                        %>
+                            <tr>
+                                <td><strong><%= b.booking_code %></strong></td>
+                                <td style="text-align: left; padding-left: 10px;">
+                                    <strong><%= b.customer_name %></strong><br>
+                                    <small style="color: #555;"><%= b.car_brand %> <%= b.car_model %> (<%= b.license_plate %>)</small>
+                                </td>
+                                <td><%= b.service_program %></td>
+                                
+                                <!-- ครอบฟอร์มครอบคลุมทั้งการเลือกช่าง สถานะ และปุ่มกด -->
+                                <td colspan="3" style="padding: 0;">
+                                    <form action="/admin/update-status" method="POST" style="display: flex; align-items: center; width: 100%; height: 100%; padding: 14px 0;">
+                                        <input type="hidden" name="booking_id" value="<%= b.id %>">
+                                        
+                                        <!-- เลือกพนักงานที่รับผิดชอบ -->
+                                        <div style="width: 34.6%; text-align: center;">
+                                            <select name="assigned_staff" class="select-custom">
+                                                <option value="">-- ยังไม่มอบหมาย --</option>
+                                                <% staffs.forEach(s => { 
+                                                    const sName = s.full_name || s.username;
+                                                    const isSel = (Number(b.assigned_staff_id) === Number(s.id));
+                                                %>
+                                                    <option value="<%= s.id %>" <%= isSel ? 'selected' : '' %>><%= sName %></option>
+                                                <% }); %>
+                                            </select>
+                                        </div>
+
+                                        <!-- แสดง Badge สถานะปัจจุบัน -->
+                                        <div style="width: 26.9%; text-align: center;">
+                                            <% if (st === 'completed' || st === 'เสร็จสิ้น') { %>
+                                                <span class="status-badge status-completed">☑ เสร็จสิ้น</span>
+                                            <% } else if (st === 'cancelled' || st === 'ยกเลิก') { %>
+                                                <span class="status-badge status-cancelled">✖ ยกเลิก</span>
+                                            <% } else if (st === 'in-progress' || st === 'กำลังดำเนินการ') { %>
+                                                <span class="status-badge status-in-progress">⚙ กำลังดำเนินการ</span>
+                                            <% } else if (st === 'inspecting' || st === 'ตรวจสอบ') { %>
+                                                <span class="status-badge status-inspecting">🔍 ตรวจสอบ</span>
+                                            <% } else { %>
+                                                <span class="status-badge status-pending">⏳ รอดำเนินการ</span>
+                                            <% } %>
+                                        </div>
+
+                                        <!-- เลือกปรับเปลี่ยนสถานะ + ปุ่มอัปเดต -->
+                                        <div style="width: 38.5%; text-align: center;">
+                                            <div class="action-flex">
+                                                <select name="status" class="select-custom">
+                                                    <option value="pending" <%= (st === 'pending' || st === 'รอดำเนินการ') ? 'selected' : '' %>>รอดำเนินการ</option>
+                                                    <option value="in-progress" <%= (st === 'in-progress' || st === 'กำลังดำเนินการ') ? 'selected' : '' %>>กำลังดำเนินการ</option>
+                                                    <option value="inspecting" <%= (st === 'inspecting' || st === 'ตรวจสอบ') ? 'selected' : '' %>>ตรวจสอบ</option>
+                                                    <option value="completed" <%= (st === 'completed' || st === 'เสร็จสิ้น') ? 'selected' : '' %>>เสร็จสิ้น</option>
+                                                    <option value="cancelled" <%= (st === 'cancelled' || st === 'ยกเลิก') ? 'selected' : '' %>>ยกเลิก</option>
+                                                </select>
+                                                <button type="submit" class="btn-update">อัปเดต</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr><td colspan="6" style="padding: 30px; color: #888;">ไม่มีข้อมูลคิวในระบบ</td></tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,166 @@
+<div class="success-container">
+    <!-- ไอคอนเครื่องหมายถูก -->
+    <div class="success-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#2ec4b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+    </div>
+
+    <h1 class="success-title">เสร็จสิ้น</h1>
+    <h2 class="service-title">บริการล้างรถ Car Wash</h2>
+
+    <!-- การ์ดแสดงรายละเอียดข้อมูล -->
+    <div class="details-card">
+        <div class="detail-row">
+            <div class="detail-group">
+                <span class="label">โปรแกรม:</span> 
+                <span class="value"><%= booking.service_program || 'ล้างอัดฉีด' %></span>
+            </div>
+            <div class="detail-group">
+                <span class="label">ระยะเวลา:</span> 
+                <span class="value"><%= booking.duration || '30 นาที' %></span>
+            </div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-group">
+                <span class="label">ยี่ห้อรถ:</span> 
+                <span class="value"><%= booking.car_brand %></span>
+            </div>
+            <div class="detail-group">
+                <span class="label">รุ่น:</span> 
+                <span class="value"><%= booking.car_model %></span>
+            </div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-group">
+                <span class="label">เลขทะเบียน:</span> 
+                <span class="value"><%= booking.license_plate %></span>
+            </div>
+            <div class="detail-group">
+                <span class="label">จังหวัด:</span> 
+                <span class="value"><%= booking.province %></span>
+            </div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-group">
+                <span class="label">วันที่:</span> 
+                <span class="value"><%= booking.booking_date ? new Date(booking.booking_date).toLocaleDateString('th-TH') : '-' %></span>
+            </div>
+            <div class="detail-group">
+                <span class="label">เวลา:</span> 
+                <span class="value"><%= booking.time_slot || '-' %> น.</span>
+            </div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-group">
+                <span class="label">ชื่อ:</span> 
+                <span class="value"><%= booking.customer_name %></span>
+            </div>
+            <div class="detail-group">
+                <span class="label">เบอร์:</span> 
+                <span class="value"><%= booking.customer_phone %></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ปุ่มกลับหน้าหลัก -->
+    <a href="/user" class="btn-home">กลับหน้าหลัก</a>
+</div>
+
+<!-- CSS สำหรับจัดกึ่งกลาง ขยายตัวหนังสือ และสร้างการ์ดจัดระเบียบ -->
+<style>
+    body {
+        background-color: #f4f7f4;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        font-family: 'Kanit', sans-serif, Tahoma;
+    }
+
+    .success-container {
+        text-align: center;
+        background: #ffffff;
+        padding: 40px 50px;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        max-width: 550px;
+        width: 90%;
+    }
+
+    .success-icon {
+        margin-bottom: 10px;
+    }
+
+    .success-title {
+        color: #2ec4b6;
+        font-size: 32px;
+        font-weight: bold;
+        margin: 5px 0 10px 0;
+    }
+
+    .service-title {
+        font-size: 22px;
+        font-weight: bold;
+        color: #222;
+        margin-bottom: 25px;
+    }
+
+    .details-card {
+        background-color: #fafafa;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 30px;
+        text-align: left;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+
+    .detail-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .detail-group {
+        width: 48%;
+        font-size: 17px; /* ปรับขนาดตัวอักษรให้ใหญ่ชัดเจนขึ้น */
+        color: #333;
+    }
+
+    .label {
+        font-weight: bold;
+        color: #111;
+    }
+
+    .value {
+        color: #444;
+    }
+
+    .btn-home {
+        display: inline-block;
+        padding: 12px 36px;
+        background-color: #ffffff;
+        border: 2px solid #ffcc00;
+        color: #333;
+        font-size: 18px;
+        font-weight: bold;
+        border-radius: 30px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .btn-home:hover {
+        background-color: #ffcc00;
+        color: #000;
+    }
+</style>

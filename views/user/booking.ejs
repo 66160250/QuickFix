@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Quick Fix - การนัดหมาย</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
+
+        * {
+            font-family: 'Prompt', sans-serif !important;
+            }
+        body { font-family: 'Prompt', sans-serif; background-color: #f1f7ed; margin: 0; padding: 0; }
+        .navbar { background-color: #2f2f2f; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { color: #f4c430; font-size: 28px; font-weight: bold; font-family: serif; }
+        .nav-links a { color: #fff; text-decoration: none; margin-left: 20px; font-size: 16px; }
+        .nav-links a.active { border-bottom: 3px solid #f4c430; padding-bottom: 5px; }
+
+        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+        .page-title { font-size: 26px; font-weight: bold; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        
+        /* Service Tabs Main */
+        .category-switcher { display: flex; gap: 10px; margin-bottom: 20px; }
+        .cat-btn { padding: 10px 20px; border-radius: 20px; border: 1px solid #000; background: #fff; cursor: pointer; font-weight: bold; }
+        .cat-btn.active { background: #f4c430; border-color: #f4c430; }
+
+        /* Sub Program Tabs */
+        .sub-tabs { display: flex; gap: 10px; margin-bottom: -1px; }
+        .sub-tab-btn { padding: 10px 20px; border-radius: 15px 15px 0 0; border: 1px solid #ccc; background: #e0e0e0; cursor: pointer; font-size: 14px; }
+        .sub-tab-btn.active { background: #fde896; border-bottom: none; font-weight: bold; }
+
+        /* Form Card */
+        .booking-card { background-color: #fde896; border-radius: 0 15px 15px 15px; padding: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .duration-label { font-size: 14px; font-weight: bold; margin-bottom: 20px; }
+
+        .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; }
+        .form-group input, .form-group select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+
+        /* Time slots */
+        .time-slots { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+        .time-btn { padding: 8px 15px; border-radius: 20px; border: none; background: #fff; cursor: pointer; font-size: 13px; }
+        .time-btn.active { background: #85eb75; font-weight: bold; }
+
+        .btn-submit { display: block; margin: 30px auto 0; background-color: #f4c430; border: none; padding: 12px 60px; border-radius: 25px; font-size: 18px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="logo">Quick Fix</div>
+        <div class="nav-links">
+            <a href="/user" class="active">หน้าแรก</a>
+            <a href="/user/status">สถานะ</a>
+            <a href="/user/history">ประวัติ</a>
+            <a href="/user/about">เกี่ยวกับ</a>
+            <a href="/logout">ออกจากระบบ</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-title">
+            <span style="cursor:pointer;" onclick="history.back()">&#8592;</span> การนัดหมาย
+        </div>
+
+        <!-- เลือกหมวดหมู่หลัก (ล้างรถ / ซ่อมบำรุง) -->
+        <div class="category-switcher">
+            <button class="cat-btn active" onclick="switchCategory('wash')">บริการล้างรถ Car Wash</button>
+            <button class="cat-btn" onclick="switchCategory('maintenance')">บริการซ่อมบำรุง Maintenance</button>
+        </div>
+
+        <form action="/user/booking" method="POST">
+            <input type="hidden" name="service_category" id="service_category" value="wash">
+            <input type="hidden" name="service_program" id="service_program" value="ล้างอัดฉีด">
+            <input type="hidden" name="duration" id="duration" value="30 นาที">
+            <input type="hidden" name="booking_time" id="selected_time" required>
+
+            <!-- Sub Tabs ล้างรถ -->
+            <div id="wash-sub-tabs" class="sub-tabs">
+                <button type="button" class="sub-tab-btn active" onclick="selectProgram('ล้างอัดฉีด', '30 นาที', this)">ล้างอัดฉีด</button>
+                <button type="button" class="sub-tab-btn" onclick="selectProgram('ล้าง ดูดฝุ่น ทำความสะอาดภายใน', '2 ชั่วโมง', this)">ล้าง ดูดฝุ่น ทำความสะอาดภายใน</button>
+                <button type="button" class="sub-tab-btn" onclick="selectProgram('ขัดเคลือบเงา/แว็กซ์ทั่วไป', '3 ชั่วโมง', this)">ขัดเคลือบเงา/แว็กซ์ทั่วไป</button>
+            </div>
+
+            <!-- Sub Tabs ซ่อมบำรุง -->
+            <div id="maint-sub-tabs" class="sub-tabs" style="display: none;">
+                <button type="button" class="sub-tab-btn active" onclick="selectProgram('เช็คระยะ & น้ำมันเครื่อง', '1 ชั่วโมง', this)">เช็คระยะ&น้ำมันเครื่อง</button>
+                <button type="button" class="sub-tab-btn" onclick="selectProgram('เบรก & ช่วงล่าง', '1 ชั่วโมง', this)">เบรก & ช่วงล่าง</button>
+                <button type="button" class="sub-tab-btn" onclick="selectProgram('ระบบไฟ & แบตเตอรี่', '1 ชั่วโมง', this)">ระบบไฟ&แบตเตอรี่</button>
+                <button type="button" class="sub-tab-btn" onclick="selectProgram('ระบบปรับอากาศ', '1 ชั่วโมง', this)">ระบบปรับอากาศ</button>
+                <button type="button" class="sub-tab-btn" onclick="selectProgram('แจ้งปัญหาอื่นๆ', '1 ชั่วโมง', this)">แจ้งปัญหาอื่นๆ</button>
+            </div>
+
+            <div class="booking-card">
+                <div class="duration-label" id="duration-display">เวลาในการใช้บริการ: 30 นาที</div>
+
+                <!-- ช่องใส่ปัญหากรณีเลือก แจ้งปัญหาอื่นๆ -->
+                <div id="problem-field" style="display: none; margin-bottom: 15px;">
+                    <label style="font-size: 13px; font-weight: bold;">ระบุปัญหา :</label>
+                    <input type="text" name="problem_description" placeholder="EX : มีเสียงแปลกดัง" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc; margin-top: 5px;">
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>ยี่ห้อรถ :</label>
+                        <input type="text" name="car_brand" placeholder="EX : Toyota" required>
+                    </div>
+                    <div class="form-group">
+                        <label>รุ่นรถ :</label>
+                        <input type="text" name="car_model" placeholder="EX : Yaris" required>
+                    </div>
+                    <div class="form-group">
+                        <label>เลขทะเบียน :</label>
+                        <input type="text" name="car_license" placeholder="EX : กข 1234" required>
+                    </div>
+                    <div class="form-group">
+                        <label>จังหวัด :</label>
+                        <input type="text" name="province" placeholder="EX : ชลบุรี" required>
+                    </div>
+                    <div class="form-group">
+                        <label>วันที่ :</label>
+                        <input type="date" name="booking_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ชื่อ :</label>
+                        <input type="text" name="customer_name" value="<%= user.full_name %>" required>
+                    </div>
+                    <div class="form-group">
+                        <label>เบอร์ :</label>
+                        <input type="text" name="phone" value="<%= user.phone %>" required>
+                    </div>
+                </div>
+
+                <label style="font-size: 13px; font-weight: bold;">ช่วงเวลา :</label>
+                <div class="time-slots" id="time-slots-container">
+                    <!-- โหลดปุ่มเวลาผ่าน Script ด้านล่าง -->
+                </div>
+
+                <button type="submit" class="btn-submit">ยืนยัน</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const washTimes = ["12.00-12.30", "12.30-13.00", "13.00-13.30", "13.30-14.00", "14.00-14.30", "15.00-15.30", "16.00-16.30", "17.00-17.30", "18.00-18.30", "19.00-19.30"];
+        
+        function renderTimes(times) {
+            const container = document.getElementById('time-slots-container');
+            container.innerHTML = '';
+            times.forEach(t => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'time-btn';
+                btn.innerText = t;
+                btn.onclick = function() {
+                    document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.getElementById('selected_time').value = t;
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function switchCategory(cat) {
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('service_category').value = cat;
+            
+            if(cat === 'wash') {
+                event.target.classList.add('active');
+                document.getElementById('wash-sub-tabs').style.display = 'flex';
+                document.getElementById('maint-sub-tabs').style.display = 'none';
+                selectProgram('ล้างอัดฉีด', '30 นาที', document.querySelectorAll('#wash-sub-tabs .sub-tab-btn')[0]);
+            } else {
+                event.target.classList.add('active');
+                document.getElementById('wash-sub-tabs').style.display = 'none';
+                document.getElementById('maint-sub-tabs').style.display = 'flex';
+                selectProgram('เช็คระยะ & น้ำมันเครื่อง', '1 ชั่วโมง', document.querySelectorAll('#maint-sub-tabs .sub-tab-btn')[0]);
+            }
+        }
+
+        function selectProgram(prog, duration, btn) {
+            const subTabs = btn.parentElement.querySelectorAll('.sub-tab-btn');
+            subTabs.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            document.getElementById('service_program').value = prog;
+            document.getElementById('duration').value = duration;
+            document.getElementById('duration-display').innerText = `เวลาในการใช้บริการ: ${duration}`;
+
+            // ซ่อน/แสดง ช่องระบุปัญหา
+            if (prog === 'แจ้งปัญหาอื่นๆ') {
+                document.getElementById('problem-field').style.display = 'block';
+            } else {
+                document.getElementById('problem-field').style.display = 'none';
+            }
+
+            renderTimes(washTimes);
+        }
+
+        // โหลดเวลาตั้งต้น
+        renderTimes(washTimes);
+    </script>
+</body>
+</html>

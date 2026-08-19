@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickFix - บริการดูแลรถครบวงจร</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../partials/navbar-user') %>
+
+    <div class="container">
+        <h2 style="margin-bottom: 20px; font-weight: 600;">ยินดีต้อนรับสู่ QuickFix</h2>
+        
+        <!-- Form จองคิว -->
+        <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+            <h3 style="margin-bottom: 15px; color: var(--text-dark);">กรอกข้อมูลเพื่อจองคิวบริการ</h3>
+            
+            <form action="/api/booking" method="POST" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                    <label>ชื่อ-นามสกุล:</label>
+                    <input type="text" name="customer_name" class="form-control" required placeholder="นายกอไก่ ขอไข่">
+                </div>
+                <div>
+                    <label>เบอร์โทรศัพท์:</label>
+                    <input type="tel" name="customer_phone" class="form-control" required placeholder="0812345678">
+                </div>
+
+                <div>
+                    <label>ประเภทรถ:</label>
+                    <select name="car_type" class="form-control" required>
+                        <option value="รถยนต์">รถยนต์</option>
+                        <option value="รถจักรยานยนต์">รถจักรยานยนต์</option>
+                    </select>
+                </div>
+                <div>
+                    <label>ยี่ห้อรถ:</label>
+                    <input type="text" name="car_brand" class="form-control" required placeholder="เช่น Toyota, Honda">
+                </div>
+
+                <div>
+                    <label>รุ่นรถ:</label>
+                    <input type="text" name="car_model" class="form-control" required placeholder="เช่น Yaris, Civic">
+                </div>
+                <div>
+                    <label>ทะเบียนรถ และ จังหวัด:</label>
+                    <div style="display: flex; gap: 5px;">
+                        <input type="text" name="license_plate" class="form-control" required placeholder="กข 1234" style="flex: 1;">
+                        <input type="text" name="province" class="form-control" required placeholder="ชลบุรี" style="flex: 1;">
+                    </div>
+                </div>
+
+                <div style="grid-column: span 2;">
+                    <label>เลือกบริการ:</label>
+                    <select name="service_id" class="form-control" required>
+                        <option value="1">บริการล้างรถ / ล้างอัดฉีด (300 บาท)</option>
+                        <option value="2">บริการล้างรถ / ฉีดเคลือบเงา (500 บาท)</option>
+                        <option value="3">บริการซ่อมบำรุง / เช็กระยะ & เปลี่ยนถ่ายน้ำมันเครื่อง (1,500 บาท)</option>
+                    </select>
+                </div>
+
+                <div style="grid-column: span 2; margin-top: 15px; text-align: center;">
+                    <button type="submit" class="btn-yellow" style="width: 200px;">ยืนยันการจองคิว</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

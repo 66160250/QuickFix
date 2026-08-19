@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - QuickFix</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body { background-color: #2b2b2b; }
+        .login-card {
+            max-width: 500px;
+            margin: 60px auto;
+            background-color: #f1f7f0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        .login-header {
+            background-color: #333;
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .login-body {
+            padding: 40px 30px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="login-header">
+            <h1 style="color: var(--accent-yellow); font-size: 32px; font-weight: bold;">Quick Fix</h1>
+        </div>
+        <div class="login-body">
+            <h3 style="font-weight: 500; font-size: 16px;">ยินดีต้อนรับ</h3>
+            <p style="font-size: 14px; margin-bottom: 25px; color: #444;">เข้าสู่ระบบบริการดูแลรถของเรา Quick Fix ยินดีให้บริการ</p>
+
+            <form action="/admin/login" method="POST" style="text-align: left;">
+                <div style="margin-bottom: 15px;">
+                    <label style="font-size: 14px; font-weight: 600;">ชื่อผู้ใช้ หรือ อีเมล</label>
+                    <input type="text" name="username" class="form-control" value="admin01" style="margin-top: 5px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="font-size: 14px; font-weight: 600;">รหัสผ่าน</label>
+                    <input type="password" id="passwordInput" name="password" class="form-control" value="admin1234" style="margin-top: 5px;">
+                </div>
+                <div style="margin-bottom: 25px; display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" id="showPass" onclick="document.getElementById('passwordInput').type = this.checked ? 'text' : 'password'">
+                    <label for="showPass" style="font-size: 13px;">แสดงรหัสผ่าน</label>
+                </div>
+                <div style="text-align: center;">
+                    <button type="submit" class="btn-yellow" style="width: 160px; font-size: 18px; border-radius: 8px;">Sign in</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
