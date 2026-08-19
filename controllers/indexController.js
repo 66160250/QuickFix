@@ -55,7 +55,7 @@ exports.postBooking = async (req, res) => {
             booking_date
         ]);
 
-        res.redirect('/user/booking-success');
+        res.redirect('/user/booking-success/' + result.insertId);
     } catch (err) {
         console.error('--- BOOKING ERROR LOG ---', err);
         res.status(500).send('เกิดข้อผิดพลาดในการบันทึก: ' + err.message);
