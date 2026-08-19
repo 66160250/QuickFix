@@ -57,7 +57,7 @@ exports.postRegister = async (req, res) => {
 
         // 2. ถ้าไม่ซ้ำค่อยทำการบันทึกข้อมูล
         await db.query(
-            'INSERT INTO users (username, email, phone, password, full_name, role) VALUES (?, ?, ?, ?, ?, "user")',
+            'INSERT INTO users (username, email, phone, password, full_name, role) VALUES (?, ?, ?, ?, ?, \'user\')',
             [username, email, phone, password, username]
         );
 
