@@ -16,20 +16,22 @@ exports.getDashboard = async (req, res) => {
             'SELECT * FROM bookings ORDER BY id DESC'
         );
 
-        // ดึงเฉพาะงานของช่างคนที่ Login (เช็กจาก ID หรือ ชื่อ/Username)
+        // กำหนดข้อมูลช่างที่ Login
         const staffId = currentUser.id || 0;
         const staffName = currentUser.full_name || currentUser.username || '';
 
-        const [bookings] = await db.query(
+        // ดึงเฉพาะงานของช่างคนที่ Login (แก้ใช้ staffId, staffName และเปลี่ยนชื่อตัวแปรเป็น myBookings)
+        const [myBookings] = await db.query(
             'SELECT * FROM bookings WHERE assigned_staff_id = ? OR (assigned_staff_name = ? AND assigned_staff_name != \'\') ORDER BY id DESC',
-            [user.id, user.full_name]
+            [staffId, staffName]
         );
 
-        const bookings = (currentTab === 'my') ? myBookings : allBookings;
+        // เลือกชุดข้อมูลที่จะนำไปแสดงผลตาม Tab
+        const displayBookings = (currentTab === 'my') ? myBookings : allBookings;
 
         res.render('employee/dashboard', {
             user: currentUser,
-            bookings: bookings,
+            bookings: displayBookings,
             allBookings: allBookings,
             myBookings: myBookings,
             currentTab: currentTab
@@ -40,9 +42,8 @@ exports.getDashboard = async (req, res) => {
     }
 };
 
-// 2. อัปเดตสถานะงานจากฝั่ง Staff (แก้ไขให้รองรับทั้ง booking_id และ bookingId)
+// 2. อัปเดตสถานะงานจากฝั่ง Staff (รองรับทั้ง booking_id และ bookingId)
 exports.updateStatus = async (req, res) => {
-    // ดึงค่า ID โดยรองรับทั้ง booking_id (snake_case) และ bookingId (camelCase)
     const bookingId = req.body.booking_id || req.body.bookingId;
     const status = req.body.status;
 
@@ -57,7 +58,7 @@ exports.updateStatus = async (req, res) => {
             [status, bookingId]
         );
 
-        // รีไดเรกต์กลับไปหน้าเดิมที่กด (คงหน้าแท็บปัจจุบันไว้)
+        // รีไดเรกต์กลับไปหน้าเดิมที่กด
         const backUrl = req.get('Referrer') || '/employee/dashboard';
         res.redirect(backUrl);
     } catch (err) {
