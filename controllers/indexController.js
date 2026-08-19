@@ -18,48 +18,47 @@ exports.getBookingPage = async (req, res) => {
 exports.postBooking = async (req, res) => {
     try {
         const {
+            booking_code,
             service_id,
-            service_category,
-            service_program,
-            duration,
+            customer_name,
+            customer_phone,
             car_brand,
             car_model,
-            car_license,
+            license_plate,
             province,
-            booking_date,
-            booking_time,
-            customer_name,
-            phone,
-            problem_description
+            service_program,
+            time_slot,
+            booking_date
         } = req.body;
 
-        const bookingCode = 'Q-' + Math.floor(100 + Math.random() * 900);
-        const validServiceId = service_id || 1; 
+        // แก้ไข SQL โดยเพิ่ม phone_number เข้าไปในคอลัมน์และ VALUES
+        const sql = `
+            INSERT INTO bookings (
+                booking_code, service_id, customer_name, customer_phone, phone_number,
+                car_brand, car_model, license_plate, province, 
+                service_program, time_slot, booking_date, status
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+        `;
 
-        const [result] = await db.query(
-            `INSERT INTO bookings 
-            (booking_code, service_id, customer_name, customer_phone, car_brand, car_model, license_plate, province, service_program, time_slot, booking_date, status) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
-            [
-                bookingCode, 
-                validServiceId,
-                customer_name, 
-                phone, 
-                car_brand, 
-                car_model, 
-                car_license, 
-                province, 
-                service_program || 'ล้างอัดฉีด', 
-                booking_time,
-                booking_date || new Date()
-            ]
-        );
+        await db.query(sql, [
+            booking_code,
+            service_id,
+            customer_name,
+            customer_phone,
+            customer_phone, // ส่ง customer_phone เข้า phone_number ด้วย
+            car_brand,
+            car_model,
+            license_plate,
+            province,
+            service_program,
+            time_slot,
+            booking_date
+        ]);
 
-        console.log('--- บันทึกสำเร็จ! ID:', result.insertId);
-        res.redirect(`/user/booking-success/${result.insertId}`);
+        res.redirect('/user/booking-success');
     } catch (err) {
         console.error('--- BOOKING ERROR LOG ---', err);
-        res.status(500).send('เกิดข้อผิดพลาดในการบันทึก: ' + err.sqlMessage);
+        res.status(500).send('เกิดข้อผิดพลาดในการบันทึก: ' + err.message);
     }
 };
 
