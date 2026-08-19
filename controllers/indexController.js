@@ -18,7 +18,6 @@ exports.getBookingPage = async (req, res) => {
 exports.postBooking = async (req, res) => {
     try {
         const {
-            booking_code,
             service_id,
             customer_name,
             customer_phone,
@@ -31,7 +30,16 @@ exports.postBooking = async (req, res) => {
             booking_date
         } = req.body;
 
-        // แก้ไข SQL โดยเพิ่ม phone_number เข้าไปในคอลัมน์และ VALUES
+        // 1. สร้าง booking_code อัตโนมัติหากไม่ได้ส่งมาจากฟอร์ม (เช่น BK-894123)
+        const booking_code = req.body.booking_code || ('BK-' + Math.floor(100000 + Math.random() * 900000));
+
+        // 2. กำหนดค่าเริ่มต้นป้องกันการส่ง NULL ไปยัง Database
+        const safeServiceId = service_id || 1;
+        const safePhone = customer_phone || '';
+        const safePlate = license_plate || '';
+        const safeTime = time_slot || '09:00 - 10:00';
+        const safeName = customer_name || 'ลูกค้าทั่วไป';
+
         const sql = `
             INSERT INTO bookings (
                 booking_code, service_id, customer_name, customer_phone, phone_number,
@@ -40,21 +48,22 @@ exports.postBooking = async (req, res) => {
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
         `;
 
-        await db.query(sql, [
+        const [result] = await db.query(sql, [
             booking_code,
-            service_id,
-            customer_name,
-            customer_phone,
-            customer_phone, // ส่ง customer_phone เข้า phone_number ด้วย
-            car_brand,
-            car_model,
-            license_plate,
-            province,
-            service_program,
-            time_slot,
-            booking_date
+            safeServiceId,
+            safeName,
+            safePhone,
+            safePhone,
+            car_brand || '',
+            car_model || '',
+            safePlate,
+            province || '',
+            service_program || '',
+            safeTime,
+            booking_date || new Date().toISOString().split('T')[0]
         ]);
 
+        // Redirect ไปยังหน้าสำเร็จพร้อมแนบ ID ของคิวที่เพิ่งบันทึก
         res.redirect('/user/booking-success/' + result.insertId);
     } catch (err) {
         console.error('--- BOOKING ERROR LOG ---', err);
