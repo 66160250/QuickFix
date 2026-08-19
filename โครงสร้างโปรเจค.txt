@@ -9,12 +9,9 @@ quickfix/
 │   ├── indexRoutes.js
 │   ├── employeeRoutes.js
 │   └── adminRoutes.js
-├── public/              # ไฟล์ static หน้าบ้าน (ที่อิง Figma 100%)
-│   ├── css/
-│   │   └── style.css    # CSS หลัก (เก็บโทนสี ดำ/ทอง/ครีม จาก Figma)
-│   ├── js/
-│   │   └── main.js     # JavaScript หน้าบ้าน (AJAX / Fetch)
-│   └── images/          # โลโก้ และไอคอนต่างๆ
+├── css/              
+│   └── style.css        # CSS หลัก (เก็บโทนสี ดำ/ทอง/ครีม)
+│      
 ├── views/               # หน้า HTML (EJS Template) ตาม Figma
 │   ├── partials/        # Component ใช้ซ้ำ (Navbar, Footer)
 │   │   ├── navbar-user.ejs
