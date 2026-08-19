@@ -39,18 +39,33 @@ exports.postLogin = async (req, res) => {
 // POST สมัครสมาชิกฝั่ง User
 exports.postRegister = async (req, res) => {
     const { username, email, phone, password, confirmPassword } = req.body;
+
     if (password !== confirmPassword) {
         return res.render('auth/register', { error: 'รหัสผ่านไม่ตรงกัน' });
     }
+
     try {
+        // 1. เช็กข้อมูลซ้ำล่วงหน้าผ่าน Query
+        const [existing] = await db.query(
+            'SELECT * FROM users WHERE username = ? OR email = ?',
+            [username, email]
+        );
+
+        if (existing.length > 0) {
+            return res.render('auth/register', { error: 'ชื่อผู้ใช้หรืออีเมลนี้ถูกใช้งานแล้ว' });
+        }
+
+        // 2. ถ้าไม่ซ้ำค่อยทำการบันทึกข้อมูล
         await db.query(
             'INSERT INTO users (username, email, phone, password, full_name, role) VALUES (?, ?, ?, ?, ?, "user")',
             [username, email, phone, password, username]
         );
+
         res.redirect('/login');
     } catch (err) {
-        console.error(err);
-        res.render('auth/register', { error: 'ชื่อผู้ใช้หรืออีเมลนี้ถูกใช้งานแล้ว' });
+        // ปริ้นต์ Error จริงออกมาดูใน Logs ของ Render
+        console.error('Register Error Details:', err);
+        res.render('auth/register', { error: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล (' + err.message + ')' });
     }
 };
 
