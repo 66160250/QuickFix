@@ -45,7 +45,7 @@ exports.postRegister = async (req, res) => {
     }
 
     try {
-        // 1. เช็กข้อมูลซ้ำล่วงหน้าผ่าน Query
+        // 1. เช็กข้อมูลซ้ำล่วงหน้า
         const [existing] = await db.query(
             'SELECT * FROM users WHERE username = ? OR email = ?',
             [username, email]
@@ -55,15 +55,14 @@ exports.postRegister = async (req, res) => {
             return res.render('auth/register', { error: 'ชื่อผู้ใช้หรืออีเมลนี้ถูกใช้งานแล้ว' });
         }
 
-        // 2. ถ้าไม่ซ้ำค่อยทำการบันทึกข้อมูล
+        // 2. บันทึกข้อมูลโดยส่งค่า 'user' ผ่าน Parameter Array
         await db.query(
-            'INSERT INTO users (username, email, phone, password, full_name, role) VALUES (?, ?, ?, ?, ?, \'user\')',
-            [username, email, phone, password, username]
+            'INSERT INTO users (username, email, phone, password, full_name, role) VALUES (?, ?, ?, ?, ?, ?)',
+            [username, email, phone, password, username, 'user']
         );
 
         res.redirect('/login');
     } catch (err) {
-        // ปริ้นต์ Error จริงออกมาดูใน Logs ของ Render
         console.error('Register Error Details:', err);
         res.render('auth/register', { error: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล (' + err.message + ')' });
     }
