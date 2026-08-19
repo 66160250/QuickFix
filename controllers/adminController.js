@@ -84,24 +84,47 @@ exports.updateStatus = async (req, res) => {
 // 4. บันทึกการชำระเงิน
 exports.processPayment = async (req, res) => {
     try {
-        const { bookingId, total_price, expense, net_income } = req.body;
+        // รองรับทั้ง bookingId, booking_id และ booking_code
+        const targetId = req.body.bookingId || req.body.booking_id || req.body.booking_code;
+        
+        // รับและแปลงค่าตัวเลข (ป้องกัน NaN)
+        const totalPrice = Number(req.body.total_price || req.body.totalPrice || 0);
+        const expense = Number(req.body.expense || 0);
+        const netIncome = Number(req.body.net_income || req.body.netIncome || (totalPrice - expense));
 
-        // ใช้เครื่องหมาย ? แทนการใส่ค่าลงไปใน String โดยตรง
+        if (!targetId) {
+            console.error('❌ ไม่พบ ID หรือ Booking Code ใน req.body');
+            return res.status(400).send('ไม่พบข้อมูลรายการที่ต้องการชำระเงิน');
+        }
+
+        // อัปเดตข้อมูลโดยเช็กทั้ง id และ booking_code
         const sql = `
             UPDATE bookings 
             SET 
                 total_price = ?, 
                 expense = ?, 
                 net_income = ?, 
-                payment_status = 'paid'  -- ใช้ Single Quote รอบคำว่า 'paid' แบบนี้
-            WHERE id = ?
+                payment_status = 'paid',
+                status = 'completed'
+            WHERE id = ? OR booking_code = ?
         `;
 
-        await db.query(sql, [total_price, expense, net_income, bookingId]);
+        const [result] = await db.query(sql, [
+            totalPrice, 
+            expense, 
+            netIncome, 
+            targetId, 
+            targetId
+        ]);
 
-        res.redirect('/admin/dashboard'); // หรือ Redirect ไปหน้าที่ต้องการ
+        console.log(`✅ ชำระเงินสำเร็จ (อัปเดตไป ${result.affectedRows} แถว)`);
+
+        // รีไดเรกต์กลับหน้าเดิม
+        const backUrl = req.get('Referrer') || '/admin/dashboard';
+        res.redirect(backUrl);
+
     } catch (err) {
         console.error('❌ Process Payment Error:', err);
-        res.status(500).send('เกิดข้อผิดพลาดในการบันทึกชำระเงิน');
+        res.status(500).send('เกิดข้อผิดพลาดในการบันทึกชำระเงิน: ' + err.message);
     }
 };
