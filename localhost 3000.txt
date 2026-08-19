@@ -1,5 +1,0 @@
-Admin Login: http://localhost:3000/admin/login
-
-Admin Dashboard: http://localhost:3000/admin/dashboard
-
-User History: http://localhost:3000/history
